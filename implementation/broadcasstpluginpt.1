@@ -1,0 +1,33 @@
+// Assuming necessary imports based on your Java implementation
+// import { Location } from './Location';
+// import { ComplexAgent } from './ComplexAgent';
+//Chatgpt, unedited code v1
+
+export abstract class BroadcastPacket {
+
+    public readonly sender: ComplexAgent;
+    public readonly range: number;
+    public readonly location: Location;
+    private persistence: number = 1;
+
+    constructor(dispatcherId: ComplexAgent) {
+        this.sender = dispatcherId;
+        this.location = dispatcherId.getPosition();
+
+        if (this.sender.params.broadcastEnergyBased) {
+            this.range = BroadcastPacket.getRadius(this.sender.getEnergy());
+        } else {
+            this.range = this.sender.params.broadcastFixedRange.getValue();
+        }
+    }
+
+    private static getRadius(energy: number): number {
+        return Math.floor(energy / 10) + 1; // limiting minimum to 1 unit of radius
+    }
+
+    public abstract process(receiver: ComplexAgent): void;
+
+    public updateCheckActive(): boolean {
+        return this.persistence-- >= 0;
+    }
+}
